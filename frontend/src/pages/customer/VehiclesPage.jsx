@@ -98,15 +98,16 @@ const VehiclesPage = () => {
   const handleSubmit = async (form) => {
     try {
       const payload = { ...form };
-      
       const res = await api.post('/vehicles', payload);
       setVehicles(prev => [...prev, res.data])
       toast.success('Vehicle added successfully')
-      
       setModalOpen(false)
     } catch (error) {
-      toast.error('Failed to save vehicle');
-      console.error(error);
+      const status = error.response?.status;
+      if (status !== 401 && status !== 403) {
+        toast.error('Failed to save vehicle');
+      }
+      console.error('Save vehicle error:', error);
     }
   }
 

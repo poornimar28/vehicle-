@@ -110,8 +110,11 @@ const AppointmentsPage = () => {
       toast.success('Appointment booked successfully!');
       setModalOpen(false);
     } catch (error) {
-      toast.error('Failed to book appointment.');
-      console.error(error);
+      const status = error.response?.status;
+      if (status !== 401 && status !== 403) {
+        toast.error('Failed to book appointment.');
+      }
+      console.error('Book appointment error:', error);
     }
   }
 

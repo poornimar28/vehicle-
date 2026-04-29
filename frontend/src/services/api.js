@@ -7,50 +7,117 @@ import {
 } from '../utils/mockData'
 
 // ─── Demo / Mock Mode ─────────────────────────────────────────────────────────
-// When the user logs in via demo accounts the token starts with "mock-jwt-token-"
-// In that case we skip real network calls and return local mock data.
+// When logged in via demo accounts, the token is "mock-jwt-token-customer" etc.
+// We detect this and use a custom adapter to return local mock data — no real
+// network call is made, so there are no 401 errors or failed-toast spam.
 
 const isMockToken = () => {
   const token = localStorage.getItem('vsms_token')
-  return token?.startsWith('mock-jwt-token-')
+  return !!token?.startsWith('mock-jwt-token-')
 }
 
-const getMockRole = () => {
-  const token = localStorage.getItem('vsms_token') || ''
-  // token is like "mock-jwt-token-customer" or "mock-jwt-token-admin"
-  return token.replace('mock-jwt-token-', '').toUpperCase()
-}
+// Internal mock vehicle store (supports add / delete within the session)
+let _mockVehicles = [...MOCK_VEHICLES]
+let _mockAppointments = [...MOCK_APPOINTMENTS]
 
-// Map each endpoint pattern to mock data
-const MOCK_RESPONSES = {
-  'GET /vehicles':            { data: MOCK_VEHICLES },
-  'GET /appointments':        { data: MOCK_APPOINTMENTS },
-  'GET /services/history':    { data: MOCK_SERVICE_HISTORY },
-  'GET /admin/appointments':  { data: MOCK_ADMIN_REQUESTS },
-  'GET /admin/services':      { data: [] },
-  'POST /vehicles':           (payload) => ({ data: { id: Date.now(), ...payload } }),
-  'POST /appointments':       (payload) => ({ data: { id: Date.now(), status: 'BOOKED', vehicle: MOCK_VEHICLES.find(v => v.id === payload.vehicleId) || MOCK_VEHICLES[0], ...payload } }),
-  'DELETE /vehicles':         { data: {} },
-  'PATCH /admin/appointments': { data: {} },
-  'PATCH /services':          { data: {} },
-}
+const getMockResponse = (method, url) => {
+  const m = method.toUpperCase()
 
-const resolveMock = (method, url) => {
-  const key = `${method.toUpperCase()} ${url}`
-  // Try exact match first
-  if (MOCK_RESPONSES[key]) {
-    const val = MOCK_RESPONSES[key]
-    return typeof val === 'function' ? null : Promise.resolve(val) // fn needs payload
+  // ── Vehicles ──────────────────────────────────────────────────────────────
+  if (m === 'GET' && url === '/vehicles')
+    return { data: _mockVehicles }
+
+  if (m === 'POST' && url === '/vehicles') {
+    // payload is already parsed by the time we get here
+    return null // handled below with payload
   }
-  // Try prefix match (for dynamic routes like /vehicles/1, /admin/appointments/2/accept)
-  for (const [pattern, val] of Object.entries(MOCK_RESPONSES)) {
-    const [pMethod, pPath] = pattern.split(' ')
-    if (pMethod === method.toUpperCase() && url.startsWith(pPath)) {
-      return typeof val === 'function' ? null : Promise.resolve(val)
+
+  if (m === 'DELETE' && url.startsWith('/vehicles/')) {
+    const id = Number(url.split('/').pop())
+    _mockVehicles = _mockVehicles.filter(v => v.id !== id)
+    return { data: {} }
+  }
+
+  // ── Appointments ──────────────────────────────────────────────────────────
+  if (m === 'GET' && url === '/appointments')
+    return { data: _mockAppointments }
+
+  if (m === 'GET' && url === '/appointments/upcoming')
+    return { data: _mockAppointments.filter(a => ['BOOKED', 'ACCEPTED'].includes(a.status)) }
+
+  // ── Service history ───────────────────────────────────────────────────────
+  if (m === 'GET' && url === '/services/history')
+    return { data: MOCK_SERVICE_HISTORY }
+
+  if (m === 'PATCH' && url.match(/^\/services\/\d+\/rate$/))
+    return { data: {} }
+
+  // ── Admin ─────────────────────────────────────────────────────────────────
+  if (m === 'GET' && url === '/admin/appointments')
+    return { data: MOCK_ADMIN_REQUESTS }
+
+  if (m === 'GET' && url === '/admin/services')
+    return { data: MOCK_SERVICE_HISTORY }
+
+  if (m === 'PATCH' && url.match(/^\/admin\/appointments\/\d+\/(accept|reject)$/))
+    return { data: {} }
+
+  // Fallback
+  return { data: [] }
+}
+
+// Custom axios adapter used in demo/mock mode — replaces real HTTP transport
+const mockAdapter = async (config) => {
+  // Give a tiny delay so UI shows loading state briefly
+  await new Promise(resolve => setTimeout(resolve, 250))
+
+  const method = config.method?.toUpperCase() || 'GET'
+  const url = config.url || ''
+
+  let responseData
+
+  // Handle POST /vehicles (needs payload)
+  if (method === 'POST' && url === '/vehicles') {
+    const payload = typeof config.data === 'string' ? JSON.parse(config.data) : (config.data || {})
+    const newVehicle = {
+      id: Date.now(),
+      make: payload.make || '',
+      modelNumber: payload.modelNumber || '',
+      chassisNumber: payload.chassisNumber || '',
+      model: payload.model || payload.modelNumber || '',
+      year: payload.year || new Date().getFullYear(),
+      serviceCount: 0,
     }
+    _mockVehicles = [..._mockVehicles, newVehicle]
+    responseData = { data: newVehicle }
   }
-  // Default: empty array
-  return Promise.resolve({ data: [] })
+  // Handle POST /appointments (needs payload)
+  else if (method === 'POST' && url === '/appointments') {
+    const payload = typeof config.data === 'string' ? JSON.parse(config.data) : (config.data || {})
+    const vehicle = _mockVehicles.find(v => v.id === Number(payload.vehicleId)) || _mockVehicles[0]
+    const newAppt = {
+      id: Date.now(),
+      status: 'BOOKED',
+      vehicle,
+      date: payload.date,
+      timeSlot: payload.timeSlot,
+      notes: payload.notes || '',
+    }
+    _mockAppointments = [..._mockAppointments, newAppt]
+    responseData = { data: newAppt }
+  }
+  else {
+    responseData = getMockResponse(method, url)
+  }
+
+  return {
+    data: responseData?.data ?? [],
+    status: 200,
+    statusText: 'OK',
+    headers: {},
+    config,
+    request: {},
+  }
 }
 
 // ─── Axios Instance ───────────────────────────────────────────────────────────
@@ -60,32 +127,15 @@ const api = axios.create({
   headers: { 'Content-Type': 'application/json' },
 })
 
-// Request interceptor — attach token + intercept mock mode
+// Request interceptor — attach token, swap adapter in demo mode
 api.interceptors.request.use(
   (config) => {
     const token = localStorage.getItem('vsms_token')
     if (token) config.headers.Authorization = `Bearer ${token}`
 
-    // In demo mode, cancel the real request and inject mock data
+    // Swap to mock adapter when in demo mode
     if (isMockToken()) {
-      const url = config.url || ''
-      const method = config.method || 'get'
-      const mockPromise = resolveMock(method, url)
-
-      // Attach mock resolver to config so response interceptor can use it
-      config._mockData = mockPromise !== null
-        ? mockPromise
-        : (() => {
-            // Handle POST with payload
-            const pattern = `${method.toUpperCase()} ${url}`
-            const fn = Object.entries(MOCK_RESPONSES).find(([k]) => k === pattern)?.[1]
-            return fn ? Promise.resolve(fn(config.data ? JSON.parse(config.data) : {})) : Promise.resolve({ data: {} })
-          })()
-
-      // Use cancelToken trick to abort real request
-      const source = axios.CancelToken.source()
-      config.cancelToken = source.token
-      source.cancel('__MOCK__')
+      config.adapter = mockAdapter
     }
 
     return config
@@ -93,21 +143,10 @@ api.interceptors.request.use(
   (error) => Promise.reject(error)
 )
 
-// Response interceptor — handle mock cancellations + 401
+// Response interceptor — handle 401 (redirect to login)
 api.interceptors.response.use(
   (response) => response,
-  async (error) => {
-    // Intercept mock cancellations and return mock data
-    if (axios.isCancel(error) && error.message === '__MOCK__') {
-      // Retrieve mock data from the original request config
-      const mockData = error.config?._mockData
-      if (mockData) {
-        return mockData
-      }
-      return Promise.resolve({ data: [] })
-    }
-
-    // Handle 401 — clear session and redirect to login (but only if not already on /login)
+  (error) => {
     if (error.response?.status === 401) {
       const alreadyOnLogin = window.location.pathname === '/login'
       if (!alreadyOnLogin) {
@@ -116,7 +155,6 @@ api.interceptors.response.use(
         window.location.href = '/login'
       }
     }
-
     return Promise.reject(error)
   }
 )
