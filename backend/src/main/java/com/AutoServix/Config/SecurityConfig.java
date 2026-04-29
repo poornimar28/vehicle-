@@ -40,7 +40,8 @@ public class SecurityConfig {
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
                         .requestMatchers("/api/auth/**").permitAll()
-                        .anyRequest().authenticated()
+                        .requestMatchers("/api/**").authenticated() // protect API endpoints
+                        .anyRequest().permitAll() // permit everything else (React frontend, assets, index.html)
                 )
 
                 .sessionManagement(session ->
