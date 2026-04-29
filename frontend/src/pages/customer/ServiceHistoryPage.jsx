@@ -87,9 +87,13 @@ const ServiceHistoryPage = () => {
   const fetchHistory = async () => {
     try {
       const res = await api.get('/services/history')
-      setHistory(res.data)
+      setHistory(Array.isArray(res.data) ? res.data : [])
     } catch (error) {
-      toast.error('Failed to load service history')
+      const status = error.response?.status;
+      if (status !== 401 && status !== 403) {
+        toast.error('Failed to load service history')
+      }
+      console.error('Service history error:', error)
     } finally {
       setIsLoading(false)
     }

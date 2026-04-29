@@ -78,10 +78,13 @@ const VehiclesPage = () => {
     const fetchVehicles = async () => {
       try {
         const res = await api.get('/vehicles');
-        setVehicles(res.data);
+        setVehicles(Array.isArray(res.data) ? res.data : []);
       } catch (error) {
+        const status = error.response?.status;
+        if (status !== 401 && status !== 403) {
+          toast.error("Failed to load vehicles.");
+        }
         console.error("Failed to fetch vehicles", error);
-        toast.error("Failed to load vehicles.");
       } finally {
         setLoading(false);
       }

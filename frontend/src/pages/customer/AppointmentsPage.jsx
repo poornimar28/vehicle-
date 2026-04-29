@@ -81,11 +81,14 @@ const AppointmentsPage = () => {
           api.get('/appointments'),
           api.get('/vehicles')
         ]);
-        setAppointments(appRes.data);
-        setVehicles(vehRes.data);
+        setAppointments(Array.isArray(appRes.data) ? appRes.data : []);
+        setVehicles(Array.isArray(vehRes.data) ? vehRes.data : []);
       } catch (error) {
+        const status = error.response?.status;
+        if (status !== 401 && status !== 403) {
+          toast.error("Failed to load data.");
+        }
         console.error("Failed to fetch appointments", error);
-        toast.error("Failed to load data.");
       } finally {
         setLoading(false);
       }

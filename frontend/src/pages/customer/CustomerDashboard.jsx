@@ -32,14 +32,13 @@ const CustomerDashboard = () => {
       try {
         if (!user?.id) return;
         const [vehiclesRes, appointmentsRes, historyRes] = await Promise.all([
-          api.get(`/vehicles`),
-          api.get(`/appointments`),
-          api.get(`/services/history`)
+          api.get('/vehicles'),
+          api.get('/appointments'),
+          api.get('/services/history')
         ]);
-        
-        setVehicles(vehiclesRes.data);
-        setAppointments(appointmentsRes.data);
-        setHistory(historyRes.data);
+        setVehicles(Array.isArray(vehiclesRes.data) ? vehiclesRes.data : []);
+        setAppointments(Array.isArray(appointmentsRes.data) ? appointmentsRes.data : []);
+        setHistory(Array.isArray(historyRes.data) ? historyRes.data : []);
       } catch (error) {
         console.error("Error fetching dashboard data:", error);
       } finally {

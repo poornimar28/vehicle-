@@ -18,9 +18,13 @@ const AdminDashboard = () => {
   const fetchRequests = async () => {
     try {
       const res = await api.get('/admin/appointments')
-      setRequests(res.data)
+      setRequests(Array.isArray(res.data) ? res.data : [])
     } catch (error) {
-      toast.error('Failed to load appointments')
+      const status = error.response?.status;
+      if (status !== 401 && status !== 403) {
+        toast.error('Failed to load appointments')
+      }
+      console.error('Admin appointments error:', error)
     } finally {
       setIsLoading(false)
     }
