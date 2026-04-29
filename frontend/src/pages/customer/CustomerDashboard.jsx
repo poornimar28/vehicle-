@@ -32,9 +32,9 @@ const CustomerDashboard = () => {
       try {
         if (!user?.id) return;
         const [vehiclesRes, appointmentsRes, historyRes] = await Promise.all([
-          api.get(`/vehicle/customer/${user.id}`),
-          api.get(`/appointment/customer/${user.id}`),
-          api.get(`/service-record/customer/${user.id}`)
+          api.get(`/vehicles`),
+          api.get(`/appointments`),
+          api.get(`/services/history`)
         ]);
         
         setVehicles(vehiclesRes.data);

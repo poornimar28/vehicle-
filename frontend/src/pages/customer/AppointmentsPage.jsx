@@ -75,8 +75,8 @@ const AppointmentsPage = () => {
       try {
         if (!user?.id) return;
         const [appRes, vehRes] = await Promise.all([
-          api.get(`/appointment/customer/${user.id}`),
-          api.get(`/vehicle/customer/${user.id}`)
+          api.get(`/appointments`),
+          api.get(`/vehicles`)
         ]);
         setAppointments(appRes.data);
         setVehicles(vehRes.data);
@@ -93,14 +93,12 @@ const AppointmentsPage = () => {
   const handleBook = async (form) => {
     try {
       const payload = {
-        vehicle: { id: form.vehicleId },
-        customer: { id: user.id },
+        vehicleId: form.vehicleId,
         date: form.date,
         timeSlot: form.timeSlot,
-        notes: form.notes,
-        status: 'BOOKED'
+        notes: form.notes
       };
-      const res = await api.post('/appointment/add', payload);
+      const res = await api.post('/appointments', payload);
       setAppointments(prev => [...prev, res.data]);
       toast.success('Appointment booked successfully!');
       setModalOpen(false);
