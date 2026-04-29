@@ -71,10 +71,13 @@ const VehiclesPage = () => {
   const toast = useToast()
 
   useEffect(() => {
+    if (!user?.id) {
+      setLoading(false);
+      return;
+    }
     const fetchVehicles = async () => {
       try {
-        if (!user?.id) return;
-        const res = await api.get(`/vehicles`);
+        const res = await api.get('/vehicles');
         setVehicles(res.data);
       } catch (error) {
         console.error("Failed to fetch vehicles", error);
@@ -84,7 +87,8 @@ const VehiclesPage = () => {
       }
     };
     fetchVehicles();
-  }, [user?.id, toast]);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [user?.id]);
 
   const openAdd = () => { setEditVehicle(null); setModalOpen(true) }
 

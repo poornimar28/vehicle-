@@ -71,12 +71,15 @@ const AppointmentsPage = () => {
   const toast = useToast()
 
   useEffect(() => {
+    if (!user?.id) {
+      setLoading(false);
+      return;
+    }
     const fetchData = async () => {
       try {
-        if (!user?.id) return;
         const [appRes, vehRes] = await Promise.all([
-          api.get(`/appointments`),
-          api.get(`/vehicles`)
+          api.get('/appointments'),
+          api.get('/vehicles')
         ]);
         setAppointments(appRes.data);
         setVehicles(vehRes.data);
@@ -88,7 +91,8 @@ const AppointmentsPage = () => {
       }
     };
     fetchData();
-  }, [user?.id, toast]);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [user?.id]);
 
   const handleBook = async (form) => {
     try {
