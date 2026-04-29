@@ -28,10 +28,7 @@ public class AuthService {
         Customer customer = new Customer(
                 request.getName(),
                 request.getEmail(),
-                encodedPassword,
-                request.getModelNo(),
-                request.getBrand(),
-                request.getChassisNo()
+                encodedPassword
         );
 
         // Set role from request, default to CUSTOMER

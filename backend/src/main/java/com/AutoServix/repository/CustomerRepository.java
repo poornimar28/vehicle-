@@ -14,8 +14,7 @@ public interface CustomerRepository extends JpaRepository<Customer, Integer> {
     // Find by name
     List<Customer> findByName(String name);
 
-    // Find by brand
-    List<Customer> findByBrand(String brand);
+    // Find by brand removed (now in Vehicle)
 
     // Find by role
     List<Customer> findByRole(String role);
@@ -23,6 +22,5 @@ public interface CustomerRepository extends JpaRepository<Customer, Integer> {
     // Check if email already exists (for registration validation)
     boolean existsByEmail(String email);
 
-    // Check if chassisNo already exists
-    boolean existsByChassisNo(Integer chassisNo);
+    // Check if chassisNo already exists removed (now in Vehicle)
 }

@@ -38,7 +38,11 @@ const Icon = ({ name }) => (
 )
 
 const roleLabels = { CUSTOMER: 'Customer', ADMIN: 'Administrator', MECHANIC: 'Mechanic' }
-const roleColors = { CUSTOMER: 'text-brand-400', ADMIN: 'text-amber-400', MECHANIC: 'text-emerald-400' }
+const rolePillColors = {
+  CUSTOMER: 'bg-brand-50 text-brand-700 border-brand-200',
+  ADMIN: 'bg-amber-50 text-amber-700 border-amber-200',
+  MECHANIC: 'bg-emerald-50 text-emerald-700 border-emerald-200',
+}
 
 const Sidebar = () => {
   const { user, logout } = useAuth()
@@ -55,23 +59,23 @@ const Sidebar = () => {
   }
 
   return (
-    <aside className={`${collapsed ? 'w-16' : 'w-64'} transition-all duration-300 bg-slate-900/90 border-r border-slate-800/60 flex flex-col min-h-screen shrink-0`}>
+    <aside className={`${collapsed ? 'w-16' : 'w-64'} transition-all duration-300 bg-white border-r border-slate-200 flex flex-col min-h-screen shrink-0 shadow-sm`}>
       {/* Logo */}
-      <div className="flex items-center gap-3 px-5 py-5 border-b border-slate-800/60">
-        <div className="w-9 h-9 rounded-xl bg-brand-600 flex items-center justify-center shrink-0">
+      <div className="flex items-center gap-3 px-5 py-5 border-b border-slate-100">
+        <div className="w-9 h-9 rounded-xl bg-brand-600 flex items-center justify-center shrink-0 shadow-sm">
           <svg className="w-5 h-5 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 17a2 2 0 11-4 0 2 2 0 014 0zM19 17a2 2 0 11-4 0 2 2 0 014 0zM13 16V6a1 1 0 00-1-1H4a1 1 0 00-1 1v10m10 0h3" />
           </svg>
         </div>
         {!collapsed && (
           <div>
-            <p className="font-display font-bold text-white text-sm leading-none">VehicleServ</p>
-            <p className="text-xs text-slate-500 mt-0.5">Management System</p>
+            <p className="font-display font-bold text-slate-900 text-sm leading-none">AutoServix</p>
+            <p className="text-xs text-slate-400 mt-0.5">Service Management</p>
           </div>
         )}
         <button
           onClick={() => setCollapsed(!collapsed)}
-          className="ml-auto text-slate-600 hover:text-slate-400 transition-colors"
+          className="ml-auto text-slate-400 hover:text-slate-600 hover:bg-slate-100 p-1 rounded-lg transition-colors"
         >
           <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d={collapsed ? 'M9 5l7 7-7 7' : 'M15 19l-7-7 7-7'} />
@@ -81,16 +85,19 @@ const Sidebar = () => {
 
       {/* User info */}
       {!collapsed && (
-        <div className="px-4 py-4 border-b border-slate-800/60">
-          <div className="bg-slate-800/60 rounded-xl p-3">
-            <p className="text-sm font-medium text-slate-200 truncate">{user?.name || 'User'}</p>
-            <p className={`text-xs font-medium mt-0.5 ${roleColors[user?.role]}`}>{roleLabels[user?.role]}</p>
+        <div className="px-4 py-4 border-b border-slate-100">
+          <div className="bg-slate-50 rounded-xl p-3 border border-slate-100">
+            <p className="text-sm font-semibold text-slate-800 truncate">{user?.name || 'User'}</p>
+            <p className="text-xs text-slate-500 truncate mb-2">{user?.email || ''}</p>
+            <span className={`inline-block text-xs font-medium px-2 py-0.5 rounded-full border ${rolePillColors[user?.role]}`}>
+              {roleLabels[user?.role]}
+            </span>
           </div>
         </div>
       )}
 
       {/* Navigation */}
-      <nav className="flex-1 px-3 py-4 space-y-1">
+      <nav className="flex-1 px-3 py-4 space-y-0.5">
         {navItems.map((item) => (
           <NavLink
             key={item.path}
@@ -98,23 +105,23 @@ const Sidebar = () => {
             className={({ isActive }) =>
               `flex items-center gap-3 px-3 py-2.5 rounded-xl transition-all duration-200 ${
                 isActive
-                  ? 'bg-brand-600/20 text-brand-400 border border-brand-600/20'
-                  : 'text-slate-500 hover:text-slate-300 hover:bg-slate-800/60'
+                  ? 'bg-brand-50 text-brand-700 border border-brand-200 font-medium'
+                  : 'text-slate-500 hover:text-slate-700 hover:bg-slate-50'
               }`
             }
             title={collapsed ? item.label : undefined}
           >
             <Icon name={item.icon} />
-            {!collapsed && <span className="text-sm font-medium">{item.label}</span>}
+            {!collapsed && <span className="text-sm">{item.label}</span>}
           </NavLink>
         ))}
       </nav>
 
       {/* Logout */}
-      <div className="px-3 py-4 border-t border-slate-800/60">
+      <div className="px-3 py-4 border-t border-slate-100">
         <button
           onClick={handleLogout}
-          className="flex items-center gap-3 w-full px-3 py-2.5 rounded-xl text-slate-500 hover:text-red-400 hover:bg-red-500/10 transition-all duration-200"
+          className="flex items-center gap-3 w-full px-3 py-2.5 rounded-xl text-slate-400 hover:text-red-600 hover:bg-red-50 transition-all duration-200"
           title={collapsed ? 'Logout' : undefined}
         >
           <svg className="w-5 h-5 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">

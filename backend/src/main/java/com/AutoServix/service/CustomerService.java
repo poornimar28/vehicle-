@@ -34,23 +34,14 @@ public class CustomerService {
         return repo.findByName(name);
     }
 
-    // Get customers by brand
-    public List<Customer> getByBrand(String brand) {
-        return repo.findByBrand(brand);
-    }
+    // Get customers by brand removed (now in VehicleService)
 
     // Register new customer
     public Customer registerCustomer(Customer customer) {
         if (repo.existsByEmail(customer.getEmail())) {
             throw new RuntimeException("Email already registered: " + customer.getEmail());
         }
-        if (repo.existsByChassisNo(customer.getChassisNo())) {
-            throw new RuntimeException("Chassis number already registered: " + customer.getChassisNo());
-        }
         customer.setRole("USER");
-        if (customer.getServiceCount() == null) {
-            customer.setServiceCount(0);
-        }
         return repo.save(customer);
     }
 
@@ -61,29 +52,11 @@ public class CustomerService {
 
         existing.setName(updatedData.getName());
         existing.setEmail(updatedData.getEmail());
-        existing.setModelNo(updatedData.getModelNo());
-        existing.setBrand(updatedData.getBrand());
-        existing.setChassisNo(updatedData.getChassisNo());
-        existing.setSlot(updatedData.getSlot());
 
         return repo.save(existing);
     }
 
-    // Update slot (book appointment)
-    public Customer bookSlot(Integer id, java.time.LocalDateTime slot) {
-        Customer existing = repo.findById(id)
-                .orElseThrow(() -> new RuntimeException("Customer not found with id: " + id));
-        existing.setSlot(slot);
-        return repo.save(existing);
-    }
-
-    // Increment service count after a service is done
-    public Customer incrementServiceCount(Integer id) {
-        Customer existing = repo.findById(id)
-                .orElseThrow(() -> new RuntimeException("Customer not found with id: " + id));
-        existing.setServiceCount(existing.getServiceCount() + 1);
-        return repo.save(existing);
-    }
+    // Slot booking and service count logic moved to AppointmentService and ServiceRecordService
 
     // Delete customer
     public void deleteCustomer(Integer id) {

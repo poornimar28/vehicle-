@@ -41,11 +41,7 @@ public class CustomerController {
         return ResponseEntity.ok(service.getByName(name));
     }
 
-    // GET customers by brand
-    @GetMapping("/brand/{brand}")
-    public ResponseEntity<List<Customer>> getByBrand(@PathVariable String brand) {
-        return ResponseEntity.ok(service.getByBrand(brand));
-    }
+    // GET customers by brand removed (now in VehicleController)
 
     // POST register new customer
     @PostMapping("/register")
@@ -59,18 +55,7 @@ public class CustomerController {
         return ResponseEntity.ok(service.updateCustomer(id, customer));
     }
 
-    // PUT book a slot
-    @PutMapping("/slot/{id}")
-    public ResponseEntity<Customer> bookSlot(@PathVariable Integer id, @RequestParam String slot) {
-        LocalDateTime slotTime = LocalDateTime.parse(slot);
-        return ResponseEntity.ok(service.bookSlot(id, slotTime));
-    }
-
-    // PUT increment service count
-    @PutMapping("/service-done/{id}")
-    public ResponseEntity<Customer> incrementService(@PathVariable Integer id) {
-        return ResponseEntity.ok(service.incrementServiceCount(id));
-    }
+    // Slot booking and service count endpoints moved to AppointmentController and ServiceRecordController
 
     // DELETE customer
     @DeleteMapping("/delete/{id}")
