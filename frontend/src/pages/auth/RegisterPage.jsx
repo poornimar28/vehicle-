@@ -47,13 +47,13 @@ const RegisterPage = () => {
     <div className="min-h-screen flex items-center justify-center px-4 py-8">
       <div className="w-full max-w-md">
         <div className="text-center mb-8 animate-slide-up">
-          <div className="inline-flex items-center justify-center w-14 h-14 rounded-2xl bg-brand-600 mb-4">
+          <div className="inline-flex items-center justify-center w-14 h-14 rounded-2xl bg-brand-600 mb-4 shadow-md">
             <svg className="w-8 h-8 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 17a2 2 0 11-4 0 2 2 0 014 0zM19 17a2 2 0 11-4 0 2 2 0 014 0zM13 16V6a1 1 0 00-1-1H4a1 1 0 00-1 1v10m10 0h3" />
             </svg>
           </div>
-          <h1 className="font-display text-3xl font-bold text-white">Create Account</h1>
-          <p className="text-slate-500 mt-1">Join VehicleServ today</p>
+          <h1 className="font-display text-3xl font-bold text-slate-900">Create Account</h1>
+          <p className="text-slate-600 mt-1">Join VehicleServ today</p>
         </div>
 
         <div className="card p-8 animate-slide-up" style={{ animationDelay: '0.1s' }}>
@@ -87,9 +87,9 @@ const RegisterPage = () => {
             </button>
           </form>
 
-          <p className="text-center text-sm text-slate-500 mt-6">
+          <p className="text-center text-sm text-slate-600 mt-6">
             Already have an account?{' '}
-            <Link to="/login" className="text-brand-400 hover:text-brand-300 font-medium">Sign In</Link>
+            <Link to="/login" className="text-brand-600 hover:text-brand-500 font-medium transition-colors">Sign In</Link>
           </p>
         </div>
       </div>

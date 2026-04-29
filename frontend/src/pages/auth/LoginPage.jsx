@@ -10,7 +10,6 @@ import Spinner from '../../components/common/Spinner'
 const DEMO_USERS = [
   { role: 'CUSTOMER', email: 'customer@demo.com', password: 'demo123' },
   { role: 'ADMIN', email: 'admin@demo.com', password: 'demo123' },
-  { role: 'MECHANIC', email: 'mechanic@demo.com', password: 'demo123' },
 ]
 
 const LoginPage = () => {
@@ -58,13 +57,13 @@ const LoginPage = () => {
       <div className="w-full max-w-md">
         {/* Logo */}
         <div className="text-center mb-8 animate-slide-up">
-          <div className="inline-flex items-center justify-center w-14 h-14 rounded-2xl bg-brand-600 mb-4">
+          <div className="inline-flex items-center justify-center w-14 h-14 rounded-2xl bg-brand-600 mb-4 shadow-md">
             <svg className="w-8 h-8 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 17a2 2 0 11-4 0 2 2 0 014 0zM19 17a2 2 0 11-4 0 2 2 0 014 0zM13 16V6a1 1 0 00-1-1H4a1 1 0 00-1 1v10m10 0h3" />
             </svg>
           </div>
-          <h1 className="font-display text-3xl font-bold text-white">VehicleServ</h1>
-          <p className="text-slate-500 mt-1">Sign in to your account</p>
+          <h1 className="font-display text-3xl font-bold text-slate-900">VehicleServ</h1>
+          <p className="text-slate-600 mt-1">Sign in to your account</p>
         </div>
 
         {/* Form card */}
@@ -100,9 +99,9 @@ const LoginPage = () => {
             </button>
           </form>
 
-          <p className="text-center text-sm text-slate-500 mt-6">
+          <p className="text-center text-sm text-slate-600 mt-6">
             Don't have an account?{' '}
-            <Link to="/register" className="text-brand-400 hover:text-brand-300 font-medium">
+            <Link to="/register" className="text-brand-600 hover:text-brand-500 font-medium transition-colors">
               Register
             </Link>
           </p>
@@ -110,13 +109,13 @@ const LoginPage = () => {
 
         {/* Demo accounts */}
         <div className="mt-5 card p-4 animate-slide-up" style={{ animationDelay: '0.2s' }}>
-          <p className="text-xs font-medium text-slate-500 mb-3 uppercase tracking-wider">Quick Demo Access</p>
-          <div className="grid grid-cols-3 gap-2">
+          <p className="text-xs font-medium text-slate-500 mb-3 uppercase tracking-wider text-center">Quick Demo Access</p>
+          <div className="flex justify-center gap-3">
             {DEMO_USERS.map((u) => (
               <button
                 key={u.role}
                 onClick={() => fillDemo(u)}
-                className="text-xs py-2 px-3 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-400 hover:text-slate-200 transition-all border border-slate-700/50 font-medium"
+                className="text-sm py-2 px-6 rounded-lg bg-slate-100 hover:bg-slate-200 text-slate-700 hover:text-slate-900 transition-all border border-slate-200 font-medium"
               >
                 {u.role.charAt(0) + u.role.slice(1).toLowerCase()}
               </button>
