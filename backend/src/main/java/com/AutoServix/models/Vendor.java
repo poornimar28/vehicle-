@@ -12,7 +12,7 @@ import jakarta.persistence.Table;
 @Table(name="vendor")
 public class Vendor {
     @Id
-    @GeneratedValue(strategy=GenerationType.IDENTITY)
+    @GeneratedValue(strategy=GenerationType.AUTO)
     private Integer serviceid;
 
     @ManyToOne

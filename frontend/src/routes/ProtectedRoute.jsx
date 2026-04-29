@@ -1,8 +1,8 @@
 import React from 'react'
 import { Navigate } from 'react-router-dom'
-import { useAuth } from '../../context/AuthContext'
-import { PageLoader } from '../common/Spinner'
-import { getRoleHome } from '../../utils/helpers'
+import { useAuth } from '../context/AuthContext'
+import { PageLoader } from '../components/common/Spinner'
+import { getRoleHome } from '../utils/helpers'
 
 const ProtectedRoute = ({ children, allowedRoles }) => {
   const { user, token, loading } = useAuth()

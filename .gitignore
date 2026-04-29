@@ -31,3 +31,11 @@ build/
 
 ### VS Code ###
 .vscode/
+
+### Frontend ###
+node_modules/
+frontend/dist/
+
+### SQLite ###
+data/
+*.db

@@ -21,22 +21,28 @@ public class AuthService {
     @Autowired
     private Jwtservice jwtservice;
 
-    public AuthResponse register (RegisterRequest request) {
+    public AuthResponse register(RegisterRequest request) {
 
-        String encodedpassword = passwordEncoder.encode(request.getPassword());
+        String encodedPassword = passwordEncoder.encode(request.getPassword());
 
         Customer customer = new Customer(
                 request.getName(),
                 request.getEmail(),
-                encodedpassword,
+                encodedPassword,
                 request.getModelNo(),
                 request.getBrand(),
                 request.getChassisNo()
         );
+
+        // Set role from request, default to CUSTOMER
+        String role = (request.getRole() != null && !request.getRole().isEmpty())
+                ? request.getRole() : "CUSTOMER";
+        customer.setRole(role);
+
         customerRepo.save(customer);
 
-        String token = jwtservice.generateToken(request.getEmail());
-        return new AuthResponse(token);
+        String token = jwtservice.generateToken(customer.getEmail());
+        return new AuthResponse(token, customer.getId(), customer.getName(), customer.getEmail(), customer.getRole());
     }
 
     public AuthResponse login(LoginRequest request) {
@@ -48,7 +54,6 @@ public class AuthService {
         }
 
         String token = jwtservice.generateToken(customer.getEmail());
-        return new AuthResponse(token);
+        return new AuthResponse(token, customer.getId(), customer.getName(), customer.getEmail(), customer.getRole());
     }
-
 }
